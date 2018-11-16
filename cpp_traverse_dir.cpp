@@ -1,12 +1,29 @@
 void traverseDirs(std::string dir_name)
 {
 	DIR *dir = opendir(dir_name.c_str()); // check is dir ?
-	struct dirent *file;
+	struct dirent *entry = (struct dirent *)malloc(sizeof(struct dirent));
+        struct dirent *file = (struct dirent *)malloc(sizeof(struct dirent));
 
-	::std::vector<::std::string> dir_tmp;
 
-	while ((file = readdir(dir)) != NULL)
+        if((dir = opendir(dir_name.c_str())) == NULL)
+        {
+                ALOGD("open dir %s error", dir_name.c_str());
+                free(entry);
+                free(file);
+                return;
+        }
+
+
+	while (1)
 	{ // skip "." and ".."
+
+		if(readdir_r(dir, entry, &file) != 0)
+                {
+                        ALOGD("read dir %s error", dir_name.c_str());
+                }
+
+                if(file == NULL)
+                        break;
 
 		if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0)
 		{
